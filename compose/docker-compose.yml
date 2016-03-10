@@ -1,0 +1,20 @@
+version: '2'
+services:
+  postgres:
+    network_mode: "host"
+    build:
+      context: ../
+    ports:
+     - "8432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - AWS_ACCESS_KEY_ID=AWSAccessKeyId
+      - AWS_SECRET_ACCESS_KEY=AWSSecretKey
+      - WALE_S3_PREFIX=s3://emptybucket2
+      - WALE_S3_ENDPOINT=http+path://localhost:4569
+#    depends_on:
+#     - fakes3
+#  fakes3:
+    #volumes:
+     #- .:/fakes3_root:z
+#    image:  spurious_fakes3
