@@ -1,4 +1,4 @@
-# Docker Fake S3
+d           d       # Docker Fake S3
 
  * Source: https://github.com/stevenjack/spurious-s3
  * Website: https://github.com/stevenjack/spurious-s3
