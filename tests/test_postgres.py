@@ -1,7 +1,16 @@
 from compose.cli.command import get_project
 import unittest
+import time
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+
+def wait_for_postgres(dbname, user, password, host, port):
+    for i in range(30):
+        try:
+            conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
+        except psycopg2.OperationalError as e:
+            print i, e.message
+            time.sleep(1)
 
 
 class DockerUnittestExample(unittest.TestCase):
@@ -10,10 +19,10 @@ class DockerUnittestExample(unittest.TestCase):
         self.dbname = "testdb"
         self.project = get_project('./', ['test-docker-compose.yml'])
         self.project.up()
+        wait_for_postgres(dbname='postgres', user="postgres", password="postgres", host="127.0.0.1", port="8432")
 
     def tearDown(self):
-        pass
-        #self.project.kill()
+        self.project.kill()
         #self.project.remove_stopped()
 
     def test_postgres(self):
@@ -34,8 +43,9 @@ class DockerUnittestExample(unittest.TestCase):
 
         conn.commit()
         conn.close()
+        time.sleep(60)
         #Test something with postgres
-        pass
+        self.fail()
 
 
 if __name__ == '__main__':
