@@ -1,7 +1,8 @@
 version: '2'
 services:
   postgres:
-    image: compose_postgres
+    build:
+      context: ../postgres
     ports:
      - "8432:5432"
     environment:
@@ -13,6 +14,7 @@ services:
     depends_on:
      - fakes3
   fakes3:
-    volumes:
-     - .:/var/data/fake-s3
-    image:  spurious_fakes3
+#    volumes:
+#     - ./fakes3/:/var/data/fake-s3
+    build:
+      context: ../fakes3

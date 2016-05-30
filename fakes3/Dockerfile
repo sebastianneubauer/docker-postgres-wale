@@ -8,5 +8,5 @@ RUN gem install fakes3
 
 EXPOSE 4569
 
-ENTRYPOINT ["fakes3", "-r" ,"/var/data/fake-s3", "-p", "4569"]
+ENTRYPOINT ["fakes3", "--root" ,"/var/data/fake-s3", "-p", "4569"]
 

@@ -69,7 +69,7 @@ def check_recovery_exists():
 def pg_fetch_initial_backup(data_directory):
     if check_recovery_exists():
         run('gosu', 'postgres', 'pg_ctl', '-D', data_directory, '-m', 'fast', '-w', 'stop')
-        run('gosu', 'postgres', '/usr/bin/envdir', '/etc/wal-e.d/env', '/usr/local/bin/wal-e', 'backup-fetch', '/var/lib/postgresql/data', 'LATEST')
+        run('gosu', 'postgres', '/usr/bin/envdir', '/etc/wal-e.d/env', '/usr/local/bin/wal-e', 'backup-fetch', data_directory, 'LATEST')
         run('gosu', 'postgres', 'cp', '/tmp/recovery.conf', data_directory)
         run('gosu', 'postgres', 'pg_ctl', '-D', data_directory, '-m', 'fast', '-w', 'start')
         wait_for_file(data_directory + '/recovery.done')

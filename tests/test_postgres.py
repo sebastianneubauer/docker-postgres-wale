@@ -5,7 +5,7 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 def wait_for_postgres(dbname, user, password, host, port):
-    for i in range(30):
+    for i in range(540):
         try:
             conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
         except psycopg2.OperationalError as e:
@@ -22,7 +22,8 @@ class DockerUnittestExample(unittest.TestCase):
         wait_for_postgres(dbname='postgres', user="postgres", password="postgres", host="127.0.0.1", port="8432")
 
     def tearDown(self):
-        self.project.kill()
+        pass
+        #self.project.kill()
         #self.project.remove_stopped()
 
     def test_postgres(self):
