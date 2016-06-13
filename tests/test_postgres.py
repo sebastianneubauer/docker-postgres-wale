@@ -17,14 +17,14 @@ class DockerUnittestExample(unittest.TestCase):
 
     def setUp(self):
         self.dbname = "testdb"
-        self.project = get_project('./', ['test-docker-compose.yml'])
+        self.project = get_project('./', ['test-docker-compose2.yml'])
         self.project.up()
         wait_for_postgres(dbname='postgres', user="postgres", password="postgres", host="127.0.0.1", port="8432")
 
     def tearDown(self):
         pass
-        #self.project.kill()
-        #self.project.remove_stopped()
+        self.project.kill()
+        self.project.remove_stopped()
 
     def test_postgres(self):
         conn = psycopg2.connect(dbname='postgres', user="postgres", password="postgres", host="127.0.0.1", port="8432")
@@ -44,7 +44,15 @@ class DockerUnittestExample(unittest.TestCase):
 
         conn.commit()
         conn.close()
+        self.project.stop('postgres')
+        self.project.rm('postgres')
+        self.project.up('postgres')
+        wait_for_postgres(dbname='postgres', user="postgres", password="postgres", host="127.0.0.1", port="8432")
         time.sleep(60)
+        cur = conn.cursor()
+        cur.execute('select * from COMPANY')
+        rows = cur.fetchall()
+        self.assertEqual(rows,[])
         #Test something with postgres
         self.fail()
 

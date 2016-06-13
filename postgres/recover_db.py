@@ -6,6 +6,8 @@ import grp
 import pwd
 import os
 
+from boto.s3.connection import S3Connection, OrdinaryCallingFormat
+
 logger = logging.getLogger(__file__)
 
 
@@ -58,21 +60,29 @@ def wait_for_file(file_path):
     logger.info("file {} does exist".format(file_path))
 
 
-def check_recovery_exists():
+def check_recovery_exists(configuration):
+
+
     try:
         run('gosu', 'postgres', '/usr/bin/envdir', '/etc/wal-e.d/env', '/usr/local/bin/wal-e', 'backup-list')
     except:
+        conn = S3Connection(is_secure=False,
+                             calling_format=OrdinaryCallingFormat(),
+                             aws_access_key_id='aws_access_key_id',
+                             aws_secret_access_key='aws_secret_access_key',
+                             port=8080, host='s3proxy')
+        conn.create_bucket('bucketdockerpostgreswale')
         logger.info("recovery backup does not exist")
         return False
     return True
 
-def pg_fetch_initial_backup(data_directory):
-    if check_recovery_exists():
-        run('gosu', 'postgres', 'pg_ctl', '-D', data_directory, '-m', 'fast', '-w', 'stop')
-        run('gosu', 'postgres', '/usr/bin/envdir', '/etc/wal-e.d/env', '/usr/local/bin/wal-e', 'backup-fetch', data_directory, 'LATEST')
-        run('gosu', 'postgres', 'cp', '/tmp/recovery.conf', data_directory)
-        run('gosu', 'postgres', 'pg_ctl', '-D', data_directory, '-m', 'fast', '-w', 'start')
-        wait_for_file(data_directory + '/recovery.done')
+def pg_fetch_initial_backup(configuration):
+    if check_recovery_exists(configuration):
+        run('gosu', 'postgres', 'pg_ctl', '-D', configuration['data_directory'], '-m', 'fast', '-w', 'stop')
+        run('gosu', 'postgres', '/usr/bin/envdir', '/etc/wal-e.d/env', '/usr/local/bin/wal-e', 'backup-fetch', configuration['data_directory'], 'LATEST')
+        run('gosu', 'postgres', 'cp', '/tmp/recovery.conf', configuration['data_directory'])
+        run('gosu', 'postgres', 'pg_ctl', '-D', configuration['data_directory'], '-m', 'fast', '-w', 'start')
+        wait_for_file(configuration['data_directory'] + '/recovery.done')
 
 if __name__ == "__main__":
     # Load the configuration into a dictionary.
@@ -80,5 +90,5 @@ if __name__ == "__main__":
     pg_change_data_directory(configuration['data_directory'])
     logging.basicConfig(level=logging.DEBUG)
     logger.info("starting postgres recovery")
-    pg_fetch_initial_backup(configuration['data_directory'])
+    pg_fetch_initial_backup(configuration)
     logger.info("recovery finished")

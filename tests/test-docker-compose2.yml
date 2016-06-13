@@ -10,11 +10,11 @@ services:
       - AWS_ACCESS_KEY_ID=AWSAccessKeyId
       - AWS_SECRET_ACCESS_KEY=AWSSecretKey
       - WALE_S3_PREFIX=s3://bucketdockerpostgreswale
-      - WALE_S3_ENDPOINT=http+path://s3.amazonaws.com:4569
-    links:
-     - fakes3_service:s3.amazonaws.com
-  fakes3_service:
-    volumes:
-     - ./fakes3:/var/data/fake-s3
+      - WALE_S3_ENDPOINT=http+path://s3proxy:8080
+    depends_on:
+     - s3proxy
+  s3proxy:
+#    volumes:
+#     - ./fakes3:/var/data/fake-s3
     build:
-      context: ../fakes3
+      context: ../s3proxy
