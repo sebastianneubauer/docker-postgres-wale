@@ -10,6 +10,11 @@ Environment variables to pass to the container for WAL-E, all of these must be p
 
 `WALE_S3_PREFIX=\"s3://<bucketname>/<path>\"`
 
+# Build the image
+
+    cd postgres
+    docker build .
+
 #Testing
 
 install the requirements::
