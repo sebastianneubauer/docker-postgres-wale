@@ -1,6 +1,6 @@
 FROM postgres:9.4
 
-MAINTAINER Luke Smith
+MAINTAINER Sebastian Neubauer
 
 RUN apt-get update && apt-get install -y python-pip python-dev lzop pv daemontools rsyslog
 RUN pip install -U pip setuptools
